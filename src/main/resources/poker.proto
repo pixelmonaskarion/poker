@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package poker.networking;
+
+service Poker {
+
+  rpc PlayerJoin (JoinRequest) returns (JoinResponse) {}
+  rpc GetGameData (Empty) returns (GameData) {}
+  rpc SendChoice (Choice) returns (Empty) {}
+
+}
+
+message Choice {
+	int32 id = 1;
+	int32 choice = 2;
+	int32 newBet = 3;
+}
+
+message JoinRequest {
+	string player_name = 1;
+	string ip = 2;
+}
+
+message JoinResponse {
+	int32 response = 1;
+	Player player = 2;
+}
+
+message Player {
+	string name = 1;
+	Color color = 2;
+	int32 id = 3;
+	string ip = 4;
+	int32 money = 5;
+	bool active = 6;
+	Hand hand = 7;
+	int32 major_score = 8;
+	int32 minor_score = 9;
+}
+
+message Hand {
+	repeated Card cards = 1;
+}
+
+message Color {
+	int32 r = 1;
+	int32 g = 2;
+	int32 b = 3;
+}
+
+message Empty {}
+
+message GameData {
+	int32 round = 1;
+	repeated Card river = 2;
+	int32 bet = 3;
+	int32 table_money = 4;
+	int32 anti = 5;
+	repeated Player players = 6;
+	int32 turn = 7;
+}
+
+message Card {
+	int32 suit = 1;
+	int32 rank = 2;
+}

@@ -1,4 +1,4 @@
-package poker;
+package poker.game;
 
 public enum Rank {
 	TWO("2"),

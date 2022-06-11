@@ -1,4 +1,4 @@
-package poker;
+package poker.game;
 
 public class Hand {
 	private Card[] cards;
@@ -9,6 +9,10 @@ public class Hand {
 	
 	public Card getCard(int i) {
 		return cards[i];
+	}
+	
+	public Card[] getCards() {
+		return cards;
 	}
 	
 	public void setCard(int i, Card card) {

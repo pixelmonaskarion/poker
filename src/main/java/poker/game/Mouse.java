@@ -1,4 +1,4 @@
-package poker;
+package poker.game;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -8,7 +8,7 @@ public class Mouse implements MouseListener {
 	public ArrayList<Integer> buttons = new ArrayList<Integer>();
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		Main.mouseClicked = (Integer)e.getButton();
+		Game.mouseClicked = (Integer)e.getButton();
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {
