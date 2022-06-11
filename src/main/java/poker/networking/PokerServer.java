@@ -1,5 +1,6 @@
 package poker.networking;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -125,6 +126,10 @@ public class PokerServer {
 		} else if (round == 6) {
 			for (int i = 0; i < players.length; i++) {
 				if (players[i] == null) continue;
+				if (!players[i].getActive()) {
+					players[i] = players[i].toBuilder().setMajorScore(0).setMinorScore(0).build();
+					continue;
+				}
 				poker.game.Hand hand = new poker.game.Hand();
 				for (int c = 0; c < players[i].getHand().getCardsCount(); c++) {
 					Suit suit = Suit.values()[players[i].getHand().getCards(c).getSuit()];
@@ -222,4 +227,23 @@ public class PokerServer {
 			}
 		}
 	}
+
+	public static void roundEnd() {
+		int winningPlayer = 0;
+		for (int i = 0; i < players.length; i++) {
+			if (players[i] == null) continue;
+			players[i] = players[i].toBuilder().setActive(true).build();
+			if (players[i].getMajorScore() > players[winningPlayer].getMajorScore()) {
+				winningPlayer = i;
+			} else if (players[i].getMajorScore() == players[winningPlayer].getMajorScore()) {
+				if (players[i].getMinorScore() > players[winningPlayer].getMinorScore()) {
+					winningPlayer = i;
+				}
+			}
+		}
+		players[winningPlayer] = players[winningPlayer].toBuilder().setMoney(players[winningPlayer].getMoney()+tableMoney).build();
+		tableMoney = 0;
+		startGame();
+	}
+
 }

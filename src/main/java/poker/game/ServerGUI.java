@@ -62,10 +62,11 @@ public class ServerGUI extends JPanel implements ActionListener {
 				if (drawButton(g, "start game", Game.screenSize.width/2-100, (int)(Game.screenSize.height*0.75-50), 10, 200, 100)) PokerServer.startGame();
 			}
 		} else if (PokerServer.round == 6) {
-			if (drawButton(g, "next round", Game.screenSize.width/2-100, (int)(Game.screenSize.height*0.75-50), 10, 200, 100)) PokerServer.startGame();
+			if (drawButton(g, "next round", Game.screenSize.width/2-100, (int)(Game.screenSize.height*0.75-50), 10, 200, 100)) PokerServer.roundEnd();
 		} else {
 			g.drawString("round is: " + PokerServer.round, Game.screenSize.width/2, Game.screenSize.height/2);
 		}
+		Game.mouseClicked = 0;
 	}
 	
 	public boolean drawButton(Graphics g, String buttonText, int sx, int sy, int margin, int width, int height) {

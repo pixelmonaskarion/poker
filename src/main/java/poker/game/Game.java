@@ -8,7 +8,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.Random;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -16,8 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import poker.networking.PokerClient;
-import poker.networking.PokerServer;
-import poker.networking.PokerService;
 
 @SuppressWarnings("serial")
 public class Game extends JPanel implements ActionListener {
@@ -36,7 +36,7 @@ public class Game extends JPanel implements ActionListener {
 		frame.setVisible(true);
 		frame.setSize(screenSize.width, screenSize.height);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		Timer t = new Timer(1, main);
+		Timer t = new Timer(5000, main);
 		t.start();
 	}
 	
@@ -57,8 +57,16 @@ public class Game extends JPanel implements ActionListener {
 		        PokerClient.exit();
 		    }
 		});
-		Timer t = new Timer(1, main);
+		Timer t = new Timer(5000, main);
 		t.start();
+		java.util.Timer dataTimer = new java.util.Timer();
+		dataTimer.schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				PokerClient.getGameData();
+			}
+		}, 100, 100);
 	}
 	
 	public Keys keys = new Keys();
@@ -111,7 +119,7 @@ public class Game extends JPanel implements ActionListener {
 	}
 	
 	@Override
-	protected void paintComponent(Graphics g) {
+	protected synchronized void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (keys.codes.contains(27)) {
 			if (online) {
@@ -120,7 +128,7 @@ public class Game extends JPanel implements ActionListener {
 				System.exit(1);
 			}
 		}
-		PokerClient.getGameData();
+		
 		if (roundState == 0) {
 			g.setFont(getFont().deriveFont(30.0f));
 			for (int i = 0; i < players.length; i++) {
@@ -129,22 +137,6 @@ public class Game extends JPanel implements ActionListener {
 				g.setColor(players[i].color);
 				g.drawString(players[i].name, random.nextInt(Game.screenSize.width), random.nextInt(Game.screenSize.height));
 			}
-		} else if (roundState == 0) {
-			bet = 10;
-			river = new Card[5];
-			
-			for (int p = 0; p < players.length; p++) {
-				players[p].money -= anti;
-				tableMoney += anti;
-				players[p].hand = new Hand();
-				for (int i = 0; i < 2; i++) {
-					players[p].hand.setCard(i, deck.pop());
-				}
-			}
-			for (int i = 0; i < 3; i++) {
-				river[i] = deck.pop();
-			}
-			roundState = 1;
 		} else if (roundState == 1) {
 			for (int i = 0; i < river.length; i++) {
 				if (river[i] == null) continue;
@@ -256,8 +248,29 @@ public class Game extends JPanel implements ActionListener {
 		} else if (roundState == 6) {
 			g.drawString("End of round", screenSize.width/2-g.getFontMetrics().stringWidth("End of round")/2, 30);
 			//RuleScore score = Rouxls.check(river, players[playerID].hand);
-			String scoreString = "Major: " + players[playerID].majorScore + " Minor: " + players[playerID].minorScore;
-			g.drawString(scoreString, screenSize.width/2-g.getFontMetrics().stringWidth(scoreString)/2, 60);
+			int winningPlayer = 0;
+			for (int i = 0; i < players.length; i++) {
+				if (players[i] == null) continue;
+				if (players[i].majorScore > players[winningPlayer].majorScore) {
+					winningPlayer = i;
+				} else if (players[i].majorScore == players[winningPlayer].majorScore) {
+					if (players[i].minorScore > players[winningPlayer].minorScore) {
+						winningPlayer = i;
+					}
+				}
+			}
+			for (int i = 0; i < players.length; i++) {
+				if (players[i] == null) continue;
+				if (i == winningPlayer) {
+					g.setColor(Color.green);
+				} else {
+					g.setColor(Color.red);
+				}
+				g.drawString(players[i].name, screenSize.width/2-g.getFontMetrics().stringWidth(players[i].name)/2, 60*i+60);
+				String scoreString = "Major: " + players[i].majorScore + " Minor: " + players[i].minorScore;
+				g.drawString(scoreString, screenSize.width/2-g.getFontMetrics().stringWidth(scoreString)/2, 60*i+80);
+				g.drawString("Money on table: " + tableMoney, 50, 50);
+			}
 		}
 		mouseClicked = 0;
 	}
@@ -323,5 +336,16 @@ public class Game extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		repaint();
+	}
+	
+	@Override
+	public void repaint() {
+		super.repaint();
+		try {
+			throw new RuntimeException();
+		} catch (RuntimeException e) {
+			//e.printStackTrace();
+			//System.out.println(System.currentTimeMillis());
+		}
 	}
 }

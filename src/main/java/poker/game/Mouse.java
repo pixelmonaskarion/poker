@@ -9,6 +9,7 @@ public class Mouse implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		Game.mouseClicked = (Integer)e.getButton();
+		if (Game.main != null) Game.main.repaint();
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {

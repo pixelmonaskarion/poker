@@ -3,6 +3,7 @@ package poker.networking;
 import java.awt.Color;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -96,8 +97,6 @@ public class PokerClient {
 				getGameData();
 			}
 		});
-		
-		while (true) {}
 	}
 	
 	public static void sendChoice(int choice, int newBet) {
@@ -157,6 +156,9 @@ public class PokerClient {
 					}
 					player.hand = hand;
 					Game.main.players[i] = player;
+				}
+				synchronized (Game.main) { 
+					Game.main.repaint();
 				}
 			}
 

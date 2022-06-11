@@ -25,6 +25,7 @@ public class Keys extends KeyAdapter {
 		for (Consumer<KeyEvent> callback : pressedCallbacks) {
 			callback.accept(e);
 		}
+		if (Game.main != null) Game.main.repaint();
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
